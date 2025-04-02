@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Game Skin Viewer</h1>
+        </header>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label for="class-select">Class:</label>
+                <select id="class-select">
+                    <option value="">Select Class</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="gender-select">Gender:</label>
+                <select id="gender-select">
+                    <option value="">Select Gender</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="skin-sets-container">
+            <h2>Skin Sets</h2>
+            <div id="skin-sets" class="skin-sets">
+                <!-- Skin sets will be populated here -->
+                <p class="empty-message">Please select a class and gender to see available skin sets.</p>
+            </div>
+        </div>
+        
+        <div class="gallery-container">
+            <h2>Skins</h2>
+            <div id="gallery" class="gallery">
+                <!-- Images will be displayed here -->
+                <p class="empty-message">Select a skin set to view skins.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Skin Viewer - Created with ❤️</p>
+    </footer>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
