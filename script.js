@@ -23,6 +23,48 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedRarity = '';
     let selectedColor = '';
     let selectedSlot = '';
+    let potentialIssues = []; // Track items with potential display issues
+    
+    // Process data to ensure all items have necessary fields
+    function preprocessData(data) {
+        // Check each skin entry for required fields and identify potential issues
+        Object.entries(data).forEach(([filename, item]) => {
+            // Ensure skin_set_name is set, using "Other" as default
+            if (item.skin_set && !item.skin_set_name) {
+                item.skin_set_name = "Other";
+            }
+            
+            // Group items without skin_set under "Other" category
+            if (!item.skin_set && item.class && item.gender) {
+                item.skin_set = "other";
+                item.skin_set_name = "Other";
+            }
+            
+            // Track items that might have display issues
+            if (!item.class || !item.gender) {
+                potentialIssues.push({
+                    filename: filename,
+                    issue: "Missing required field (class or gender)",
+                    details: JSON.stringify(item)
+                });
+            }
+            
+            if (!item.slot) {
+                potentialIssues.push({
+                    filename: filename,
+                    issue: "Missing slot information",
+                    details: JSON.stringify(item)
+                });
+            }
+        });
+        
+        console.log(`Found ${potentialIssues.length} potential display issues`);
+        if (potentialIssues.length > 0) {
+            console.table(potentialIssues);
+        }
+        
+        return data;
+    }
     
     // Fetch the skin data JSON
     fetch('skin_tags.json')
@@ -33,8 +75,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            skinData = data;
-            initializeFilters(data);
+            // Preprocess and ensure all items have necessary fields
+            skinData = preprocessData(data);
+            initializeFilters(skinData);
         })
         .catch(error => {
             console.error('Error loading skin data:', error);
@@ -142,8 +185,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const skinSets = new Map(); // Use Map to maintain uniqueness while preserving skin_set and skin_set_name pairs
         
         filteredItems.forEach(item => {
-            if (item.skin_set && item.skin_set_name) {
-                skinSets.set(item.skin_set, item.skin_set_name);
+            if (item.skin_set) {
+                // Always use the skin_set_name if available, otherwise default to "Other"
+                skinSets.set(item.skin_set, item.skin_set_name || "Other");
             }
         });
         
@@ -153,29 +197,35 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Create and append skin set elements
-        skinSets.forEach((name, id) => {
-            if (name) { // Only add if there's a name
-                const skinSetElement = document.createElement('div');
-                skinSetElement.className = 'skin-set';
-                skinSetElement.textContent = name;
-                skinSetElement.dataset.setId = id;
+        // Create and append skin set elements, sorted alphabetically by name
+        const sortedSkinSets = Array.from(skinSets.entries())
+            .sort((a, b) => {
+                // Put "Other" at the end
+                if (a[1] === "Other") return 1;
+                if (b[1] === "Other") return -1;
+                return a[1].localeCompare(b[1]);
+            });
+        
+        sortedSkinSets.forEach(([id, name]) => {
+            const skinSetElement = document.createElement('div');
+            skinSetElement.className = 'skin-set';
+            skinSetElement.textContent = name;
+            skinSetElement.dataset.setId = id;
+            
+            skinSetElement.addEventListener('click', function() {
+                // Remove active class from all skin sets
+                document.querySelectorAll('.skin-set').forEach(el => el.classList.remove('active'));
                 
-                skinSetElement.addEventListener('click', function() {
-                    // Remove active class from all skin sets
-                    document.querySelectorAll('.skin-set').forEach(el => el.classList.remove('active'));
-                    
-                    // Add active class to clicked skin set
-                    this.classList.add('active');
-                    
-                    // Update selection and gallery
-                    selectedSkinSet = id;
-                    populateSecondaryFilters();
-                    updateGallery();
-                });
+                // Add active class to clicked skin set
+                this.classList.add('active');
                 
-                skinSetsContainer.appendChild(skinSetElement);
-            }
+                // Update selection and gallery
+                selectedSkinSet = id;
+                populateSecondaryFilters();
+                updateGallery();
+            });
+            
+            skinSetsContainer.appendChild(skinSetElement);
         });
     }
     
@@ -237,6 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Helper function to capitalize first letter
     function capitalizeFirstLetter(string) {
+        if (!string) return '';
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
     
@@ -304,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
             details.className = 'skin-details';
             
             const title = document.createElement('h3');
-            title.textContent = item.skin_set_name || 'Unknown Set';
+            title.textContent = item.skin_set_name || 'Other';
             
             const slotPara = document.createElement('p');
             slotPara.textContent = `Slot: ${capitalizeFirstLetter(item.slot) || 'Unknown'}`;
@@ -335,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Build caption with skin details
         let captionText = filename;
         if (item) {
-            captionText += `<br>Set: ${item.skin_set_name || 'Unknown'}`;
+            captionText += `<br>Set: ${item.skin_set_name || 'Other'}`;
             captionText += `<br>Slot: ${capitalizeFirstLetter(item.slot) || 'Unknown'}`;
             captionText += `<br>Color: ${capitalizeFirstLetter(item.color) || 'Unknown'}`;
             captionText += `<br>Rarity: ${capitalizeFirstLetter(item.rarity) || 'Unknown'}`;
