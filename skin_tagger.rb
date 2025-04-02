@@ -128,14 +128,20 @@ skin_tags.each do |filename, tags|
     tags['rarity'] = 'uncommon'
   end
   
-  # Add human-friendly skin set name if available
-  if tags.key?('skin_set')
+  # Add human-friendly skin set name
+  if tags.key?('skin_set') && !tags['skin_set'].empty?
     if SKIN_SET_FRIENDLY_NAMES.key?(tags['skin_set'])
       tags['skin_set_name'] = SKIN_SET_FRIENDLY_NAMES[tags['skin_set']]
     else
       # Capitalize the skin_set value for a default friendly name
       tags['skin_set_name'] = tags['skin_set'].capitalize
     end
+  else
+    # If no skin_set or it's empty, set skin_set_name to "Other"
+    tags['skin_set_name'] = "Other"
+    
+    # Also ensure skin_set exists with a value for consistent filtering
+    tags['skin_set'] = "other" unless tags.key?('skin_set') && !tags['skin_set'].empty?
   end
   
   # Ensure all required fields exist (use empty string for missing values)

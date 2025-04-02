@@ -25,21 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedSlot = '';
     let potentialIssues = []; // Track items with potential display issues
     
-    // Process data to ensure all items have necessary fields
+    // Process data to identify potential display issues
     function preprocessData(data) {
         // Check each skin entry for required fields and identify potential issues
         Object.entries(data).forEach(([filename, item]) => {
-            // Ensure skin_set_name is set, using "Other" as default
-            if (item.skin_set && !item.skin_set_name) {
-                item.skin_set_name = "Other";
-            }
-            
-            // Group items without skin_set under "Other" category
-            if (!item.skin_set && item.class && item.gender) {
-                item.skin_set = "other";
-                item.skin_set_name = "Other";
-            }
-            
             // Track items that might have display issues
             if (!item.class || !item.gender) {
                 potentialIssues.push({
@@ -63,6 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
             console.table(potentialIssues);
         }
         
+        // Debug: Check how many "Other" items we have
+        const otherItems = Object.values(data).filter(item => 
+            item.skin_set_name === "Other" || item.skin_set === "other"
+        );
+        console.log(`Found ${otherItems.length} items categorized as "Other"`);
+        
         return data;
     }
     
@@ -75,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            // Preprocess and ensure all items have necessary fields
+            // Preprocess and check for potential display issues
             skinData = preprocessData(data);
             initializeFilters(skinData);
         })
@@ -181,13 +176,23 @@ document.addEventListener('DOMContentLoaded', function() {
             item.class === selectedClass && item.gender === selectedGender
         );
         
+        // Debug: Check filtered items count
+        console.log(`Found ${filteredItems.length} items for ${selectedClass}/${selectedGender}`);
+        
         // Extract unique skin set names
         const skinSets = new Map(); // Use Map to maintain uniqueness while preserving skin_set and skin_set_name pairs
         
+        // Make sure we have an "Other" category if applicable
+        let hasOtherItems = false;
+        
         filteredItems.forEach(item => {
             if (item.skin_set) {
-                // Always use the skin_set_name if available, otherwise default to "Other"
-                skinSets.set(item.skin_set, item.skin_set_name || "Other");
+                skinSets.set(item.skin_set, item.skin_set_name);
+                
+                // Check if we have "Other" categorized items
+                if (item.skin_set === "other" || item.skin_set_name === "Other") {
+                    hasOtherItems = true;
+                }
             }
         });
         
@@ -196,6 +201,9 @@ document.addEventListener('DOMContentLoaded', function() {
             skinSetsContainer.innerHTML = '<p class="empty-message">No skin sets found for the selected class and gender.</p>';
             return;
         }
+        
+        // Debug: Check skin sets found
+        console.log(`Found ${skinSets.size} unique skin sets, including "Other": ${hasOtherItems}`);
         
         // Create and append skin set elements, sorted alphabetically by name
         const sortedSkinSets = Array.from(skinSets.entries())
@@ -327,6 +335,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Debug: Show how many items we're displaying
+        console.log(`Displaying ${filteredItems.length} items in the gallery`);
+        
         // Create and append gallery items
         filteredItems.forEach(([filename, item]) => {
             const skinItem = document.createElement('div');
@@ -355,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
             details.className = 'skin-details';
             
             const title = document.createElement('h3');
-            title.textContent = item.skin_set_name || 'Other';
+            title.textContent = item.skin_set_name;
             
             const slotPara = document.createElement('p');
             slotPara.textContent = `Slot: ${capitalizeFirstLetter(item.slot) || 'Unknown'}`;
@@ -386,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Build caption with skin details
         let captionText = filename;
         if (item) {
-            captionText += `<br>Set: ${item.skin_set_name || 'Other'}`;
+            captionText += `<br>Set: ${item.skin_set_name}`;
             captionText += `<br>Slot: ${capitalizeFirstLetter(item.slot) || 'Unknown'}`;
             captionText += `<br>Color: ${capitalizeFirstLetter(item.color) || 'Unknown'}`;
             captionText += `<br>Rarity: ${capitalizeFirstLetter(item.rarity) || 'Unknown'}`;
