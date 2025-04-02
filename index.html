@@ -36,6 +36,32 @@
             </div>
         </div>
         
+        <div class="secondary-filters" id="secondary-filters" style="display: none;">
+            <h3>Additional Filters</h3>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="rarity-select">Rarity:</label>
+                    <select id="rarity-select">
+                        <option value="">All Rarities</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="color-select">Color:</label>
+                    <select id="color-select">
+                        <option value="">All Colors</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="slot-select">Slot:</label>
+                    <select id="slot-select">
+                        <option value="">All Slots</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
         <div class="gallery-container">
             <h2>Skins</h2>
             <div id="gallery" class="gallery">
@@ -43,6 +69,13 @@
                 <p class="empty-message">Select a skin set to view skins.</p>
             </div>
         </div>
+    </div>
+    
+    <!-- Modal for full-size image view -->
+    <div id="image-modal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modal-image">
+        <div id="modal-caption"></div>
     </div>
     
     <footer>

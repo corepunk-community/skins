@@ -39,6 +39,11 @@ h2 {
     margin-bottom: 15px;
 }
 
+h3 {
+    color: #3498db;
+    margin-bottom: 10px;
+}
+
 /* Filters */
 .filters {
     display: flex;
@@ -64,6 +69,15 @@ select {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
+}
+
+/* Secondary Filters */
+.secondary-filters {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid #eee;
 }
 
 /* Skin Sets */
@@ -102,8 +116,8 @@ select {
 
 .gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
     min-height: 200px;
 }
 
@@ -113,33 +127,37 @@ select {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
     background-color: white;
+    cursor: pointer;
 }
 
 .skin-item:hover {
     transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .skin-item img {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
+    height: 250px;
+    object-fit: contain;
     display: block;
+    background-color: #f7f7f7;
+    padding: 10px;
 }
 
 .skin-details {
-    padding: 10px;
+    padding: 15px;
     background-color: #f9f9f9;
 }
 
 .skin-details h3 {
     font-size: 16px;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .skin-details p {
     font-size: 14px;
     color: #666;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
 }
 
 /* Messages */
@@ -151,12 +169,84 @@ select {
     width: 100%;
 }
 
+/* Modal for full-size image */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9);
+    padding-top: 60px;
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 80vh;
+    object-fit: contain;
+}
+
+#modal-caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: white;
+    padding: 10px 0;
+    height: 150px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 /* Footer */
 footer {
     text-align: center;
     margin-top: 30px;
     padding-top: 20px;
     color: #888;
+}
+
+/* Rarity colors */
+.rarity-common {
+    border-left: 4px solid #7f8c8d;
+}
+
+.rarity-uncommon {
+    border-left: 4px solid #27ae60;
+}
+
+.rarity-rare {
+    border-left: 4px solid #3498db;
+}
+
+.rarity-epic {
+    border-left: 4px solid #9b59b6;
+}
+
+.rarity-legendary {
+    border-left: 4px solid #f1c40f;
 }
 
 /* Responsive adjustments */
@@ -166,6 +256,10 @@ footer {
     }
     
     .gallery {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    
+    .modal-content {
+        width: 100%;
     }
 } 
